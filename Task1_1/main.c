@@ -21,5 +21,6 @@ int main(void)
 
 void delay(uint32_t count)
 {
-	for (uint32_t i=0;i<count;i++);
+	volatile uint32_t i;
+	for (i = 0;i<count;i++);
 }
