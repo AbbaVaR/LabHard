@@ -1,7 +1,7 @@
 #include "main.h"
 int main(void){
 	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
-	GPIOB->OSPEEDR &=~ 0x00013333;
+	GPIOB->OSPEEDR |= 0x00005555;
 	GPIOB->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0 
 								| GPIO_MODER_MODER2_0 | GPIO_MODER_MODER7_0 
 								| GPIO_MODER_MODER6_0 | GPIO_MODER_MODER5_0 
@@ -18,7 +18,7 @@ int main(void){
 			delay(100000);
 		}
 		for (uint32_t j = 0; j<9; j++){
-			GPIOB->ODR |=~ reg[j];
+			GPIOB->ODR &=~ reg[j];
 			delay(100000);
 		}
 	}
