@@ -7,21 +7,56 @@ int main(void){
 								| GPIO_MODER_MODER6_0 | GPIO_MODER_MODER5_0 
 								| GPIO_MODER_MODER4_0	|  GPIO_MODER_MODER3_0 
 								| GPIO_MODER_MODER8_0;
-	GPIOB->MODER&=~ GPIO_MODER_MODER15;
+	GPIOB->MODER&=~( GPIO_MODER_MODER12 | GPIO_MODER_MODER13 |  GPIO_MODER_MODER14 |  GPIO_MODER_MODER15);
 	
 	unsigned  reg[8] = {0x101, 0x002, 0x004, 0x080, 0x040, 0x020, 0x010, 0x008};  
-	//unsigned  regOff[8] = {0x1fe, 0x1fd, 0x1fb, 0x17f, 0x1bf, 0x1df, 0x1ef, 0x0f7};
-	
-	if(1){
-		for (uint32_t i = 0; i<9; i++){
-			GPIOB->ODR |= reg[i];
-			delay(100000);
+	uint32_t n;
+
+	while(1){
+		
+		n=((GPIOB->IDR)&0x3000)>>12;
+
+		if( ((GPIOB->IDR)&0x4000)>>14 != 1){
+			if( ((GPIOB->IDR)&0x8000)>>15 != 1){
+				for (uint32_t i = 0; i<9; i++){
+					GPIOB->ODR |= reg[i];
+					delay((uint32_t)50000<<n);
+				}		
+				for (uint32_t j = 0; j<9; j++){
+					GPIOB->ODR &=~ reg[j];
+					delay((uint32_t)50000<<n);
+				}
+			}
+			else{
+				for (uint32_t i = 0; i<9; i++){
+					GPIOB->ODR |= reg[i];
+					delay((uint32_t)50000<<n);
+					GPIOB->ODR &=~ reg[i];		
+				}	
+			}
 		}
-		for (uint32_t j = 0; j<9; j++){
-			GPIOB->ODR &=~ reg[j];
-			delay(100000);
-		}
+		
+		else{
+			if( ((GPIOB->IDR)&0x8000)>>15 != 1){
+				for (int i = 8; i>=0; i--){
+					GPIOB->ODR |= reg[i];
+					delay((uint32_t)50000<<n);
+				}		
+				for (int j = 8; j>=0; j--){
+					GPIOB->ODR &=~ reg[j];
+					delay((uint32_t)50000<<n);
+				}
+			}
+			else{
+				for (int i = 8; i>=0; i--){
+					GPIOB->ODR |= reg[i];
+					delay((uint32_t)50000<<n);
+					GPIOB->ODR &=~ reg[i];		
+				}	
+			}			
+		}	
 	}
+		
 }
 
 void delay(uint32_t count)
@@ -29,3 +64,4 @@ void delay(uint32_t count)
 	volatile uint32_t i;
 	for (i =0;i<count;i++);
 }
+
