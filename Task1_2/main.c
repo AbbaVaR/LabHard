@@ -9,8 +9,9 @@ int main(void){
 								| GPIO_MODER_MODER8_0;
 	GPIOB->MODER&=~( GPIO_MODER_MODER12 | GPIO_MODER_MODER13 |  GPIO_MODER_MODER14 |  GPIO_MODER_MODER15);
 	
-	unsigned  reg[8] = {0x101, 0x002, 0x004, 0x080, 0x040, 0x020, 0x010, 0x008};  
+	unsigned  reg[8] = {0x101, 0x102, 0x104, 0x180, 0x140, 0x120, 0x110, 0x108};  
 	uint32_t n;
+
 
 	while(1){
 		
