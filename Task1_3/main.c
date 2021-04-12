@@ -8,42 +8,44 @@ int main(void)
 								GPIO_MODER_MODER6_0 | GPIO_MODER_MODER7_0 | GPIO_MODER_MODER9_0;
 	GPIOB->MODER&=~( GPIO_MODER_MODER12 | GPIO_MODER_MODER13 |  GPIO_MODER_MODER14 |  GPIO_MODER_MODER15);
 	
-	uint16_t a[8] = {0, 0, 1, 1, 0, 0, 0, 0} ;
-	uint16_t n;
-	uint16_t out[4];
+	uint16_t in[8] = {0, 0, 1, 1, 0, 0, 0, 0} ;
+	uint16_t n = 0;
+	uint16_t out[4] = {0,0,0,0};
 
-	unsigned reg[4] = {0x0000003F, 0x00000006, 0x0000005B, 0x0000004F};
+	unsigned reg[4] = {0x0000023F, 0x00000206, 0x0000025B, 0x0000024F};
 	
 	while(1){
 		n=0;
-		a[1]=((GPIOB->IDR)&0x8000)>>15;
-		a[4]=((GPIOB->IDR)&0x4000)>>14;
-		a[6]=((GPIOB->IDR)&0x2000)>>13;
-		a[7]=((GPIOB->IDR)&0x1000)>>12;
+		in[1]=((GPIOB->IDR)&0x8000)>>15;
+		in[4]=((GPIOB->IDR)&0x4000)>>14;
+		in[6]=((GPIOB->IDR)&0x2000)>>13;
+		in[7]=((GPIOB->IDR)&0x1000)>>12;
 		
 		uint32_t j=7;
 	
 		for (uint16_t i = 0 ; i<8; i++){         //to 10
-			n += a[i]* powi (2, j);
+			n += in[i]* powi (2, j);
 			j--;
 		}
 		
-		for (uint16_t i = 0 ; i<2; i++){         //to 4		
+		for (uint16_t i = 0 ; i<4; i++){         //to 4		
 			if(n<4) {
 				out[i] = n;	
 				break;
 			}
 			out[i] = n%4;
 			n = n/4;
-		}
+		} 
 		
-		for (uint16_t i =0; i<4; i++){
+		for (int16_t i =3; i>=0; i--){
+			if(i == 3 & out[i]== 0){
+				continue;}
 			GPIOB->BSRR|=reg[out[i]];
 			delay(200000);
 			GPIOB->BSRR|=0xffff0000;			
 			delay(50000);
 		}
-		GPIOB->BSRR|=0x80;
+		GPIOB->BSRR|=0x00000280;
 		delay(500000);
 		GPIOB->BSRR|=0xffff0000;	
 	}
