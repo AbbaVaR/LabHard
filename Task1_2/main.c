@@ -17,19 +17,19 @@ int main(void){
 		
 		n=((GPIOB->IDR)&0x3000)>>12;
 
-		if( ((GPIOB->IDR)&0x4000)>>14 != 1){
-			if( ((GPIOB->IDR)&0x8000)>>15 != 1){
-				for (uint32_t i = 0; i<9; i++){
+		if( ((GPIOB->IDR)&0x4000)>>14 == 1){
+			if( ((GPIOB->IDR)&0x8000)>>15 == 1){
+				for (uint32_t i = 0; i<8; i++){
 					GPIOB->ODR |= reg[i];
 					delay((uint32_t)50000<<n);
 				}		
-				for (uint32_t j = 0; j<9; j++){
+				for (uint32_t j = 0; j<8; j++){
 					GPIOB->ODR &=~ reg[j];
 					delay((uint32_t)50000<<n);
 				}
 			}
 			else{
-				for (uint32_t i = 0; i<9; i++){
+				for (uint32_t i = 0; i<8; i++){
 					GPIOB->ODR |= reg[i];
 					delay((uint32_t)50000<<n);
 					GPIOB->ODR &=~ reg[i];		
@@ -38,18 +38,18 @@ int main(void){
 		}
 		
 		else{
-			if( ((GPIOB->IDR)&0x8000)>>15 != 1){
-				for (int i = 8; i>=0; i--){
+			if( ((GPIOB->IDR)&0x8000)>>15 == 1){
+				for (int i = 7; i>=0; i--){
 					GPIOB->ODR |= reg[i];
 					delay((uint32_t)50000<<n);
 				}		
-				for (int j = 8; j>=0; j--){
+				for (int j = 7; j>=0; j--){
 					GPIOB->ODR &=~ reg[j];
 					delay((uint32_t)50000<<n);
 				}
 			}
 			else{
-				for (int i = 8; i>=0; i--){
+				for (int i = 7; i>=0; i--){
 					GPIOB->ODR |= reg[i];
 					delay((uint32_t)50000<<n);
 					GPIOB->ODR &=~ reg[i];		
