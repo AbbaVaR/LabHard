@@ -20,11 +20,11 @@ int main(void)
 	//Конфигурирование портов GPIO 
 	RCC->AHBENR |= RCC_AHBENR_GPIOBEN; 																							 		//Включение тактирования порта B: RCC_AHBENR_GPIOBEN=0x00040000			
 	GPIOB->OSPEEDR |= 0x00005555;																												//установка частоты переключения выводов PB.0 – PB.7 на уровне 10 МГц
-	GPIOB->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0 | GPIO_MODER_MODER2_0 |		//Переключаем линий 0-7 и 9 порта B в режим "Output"
+	GPIOB->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0 | GPIO_MODER_MODER2_0 |		//Переключение линий 0-7 и 9 порта B в режим "Output"
 									GPIO_MODER_MODER3_0 | GPIO_MODER_MODER4_0 | GPIO_MODER_MODER5_0 |
 									GPIO_MODER_MODER6_0 | GPIO_MODER_MODER7_0 | GPIO_MODER_MODER9_0;
-	GPIOB->MODER&=~( GPIO_MODER_MODER12 | GPIO_MODER_MODER13 |  
-									 GPIO_MODER_MODER14 | GPIO_MODER_MODER15);													//Переключаем линий 12(SW4),13(SW3),14(SW2),15(SW1)порта B в режим "Input"
+	GPIOB->MODER&=~( GPIO_MODER_MODER12 | GPIO_MODER_MODER13 |  												//Переключаем линий 12(SW4),13(SW3),14(SW2),15(SW1)порта B в режим "Input"
+									 GPIO_MODER_MODER14 | GPIO_MODER_MODER15);													
 	
 	uint16_t input[8] = {0, 0, 1, 1, 0, 0, 0, 0} ;																			//Входное занчение числа (в двоичной системе)
 	uint16_t n = 0;																																			//Значение числа в десятичной системе
@@ -58,12 +58,12 @@ int main(void)
 				continue;}
 			GPIOB->BSRR|=reg[output[i]];																										//ввыод цифры числа
 				delay(200000);																																//задержка в 2 секунды
-				GPIOB->BSRR|=0xffff0000;																											//гашение индикатора
+				GPIOB->BSRR|=0xffff0000;																											//выключение индикатора
 			delay(50000);																																		//задержка в 0,5 секунды
 		}
 		GPIOB->BSRR|=0x00000280;																													//вывод точки
 		delay(500000);																																		//задержка в 5 секунд 
-		GPIOB->BSRR|=0xffff0000;																													//гашение индикатора
+		GPIOB->BSRR|=0xffff0000;																													//выключение индикатора
 	}
 }
 
