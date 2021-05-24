@@ -2,22 +2,26 @@
 
 int main(void)
 {
-	InitUSART1();
-	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;																						//Включение тактирования порта B: RCC_AHBENR_GPIOBEN=0x00040000																																			
-	GPIOB->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0 										//Переключение линий 0-8 порта B в режим "Output"
+	InitUSART1();																								//Инициализация USART1 лаборатоного стенда
+	RCC->AHBENR |= RCC_AHBENR_GPIOBEN;													//Включение тактирования порта B: RCC_AHBENR_GPIOBEN=0x00040000																																			
+	GPIOB->MODER |= GPIO_MODER_MODER0_0 | GPIO_MODER_MODER1_0 	//Переключение линий 0-8 порта B в режим "Output"
 								| GPIO_MODER_MODER2_0 | GPIO_MODER_MODER7_0 
 								| GPIO_MODER_MODER6_0 | GPIO_MODER_MODER5_0 
-								| GPIO_MODER_MODER4_0	|  GPIO_MODER_MODER3_0 
+								| GPIO_MODER_MODER4_0	| GPIO_MODER_MODER3_0 
 								| GPIO_MODER_MODER8_0;
-	unsigned reg[8] = {0x1, 0x2, 0x4, 0x80, 0x40, 0x20, 0x10, 0x8};  //Регистры для запуска светодиодов
-	unsigned input [9][9] = {{0x31,0}, {0x32,1}, {0x33,2}, {0x34,3}, {0x35,4}, {0x36,5}, {0x37,6}, {0x38,7}, {0x30,8}};
-	uint16_t check[8] = {0,0,0,0,0,0,0,0};
-	unsigned elem =0;
-	uint8_t d;
-	GPIOB->BSRR |= 0x100;
+	//Объявление переменных
+	unsigned reg[8] = {0x1, 0x2, 0x4, 0x80, 0x40, 0x20, 0x10, 0x8};  																											//Регистры для запуска светодиодов
+	unsigned input [9][9] = {{0x31,0}, {0x32,1}, {0x33,2}, {0x34,3}, {0x35,4}, {0x36,5}, {0x37,6}, {0x38,7}, {0x30,8}};		//Двумерный массив (Вхлдящее число в hex и его соответсявие в данной программе)
+	uint16_t check[8] = {0,0,0,0,0,0,0,0};											//Масиив состояний светодиодов (0 - выключен, 1 - включён)
+	unsigned elem = 0;																					//Номер нажатаой клавиши
+	uint8_t d;																									//Данные из USART 
+	GPIOB->BSRR |= 0x100;																				//Включение линии 8 порта B
+	
 	while(1){
-		while ((USART1->ISR & USART_ISR_RXNE) == 0) { }
-		d = (uint8_t)USART1->RDR;
+		//Получение данных из USART
+		while ((USART1->ISR & USART_ISR_RXNE) == 0) { } 					//Чтение регистра состояния ISR и анализ флага RXNE (выставляется в 1, когда новый пакет данных получен приёмником Rx и скопирован в RDR)
+		d = (uint8_t)USART1->RDR;																	//Копирование данных из USART (регистр RDR) в програмную переменную.
+		// Чтение регистра RDR приводит к сбросу флага RXNE = 0
 		
 		for (uint16_t i = 0; i < 9; i++){
 			if (d == input[i][0]){
