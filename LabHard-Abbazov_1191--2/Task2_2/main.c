@@ -13,10 +13,11 @@ int main(void)
 	unsigned input [9][9] = {{0x31,0}, {0x32,1}, {0x33,2}, {0x34,3}, {0x35,4}, {0x36,5}, {0x37,6}, {0x38,7}, {0x30,8}};
 	uint16_t check[8] = {0,0,0,0,0,0,0,0};
 	unsigned elem =0;
+	uint8_t d;
 	GPIOB->BSRR |= 0x100;
 	while(1){
 		while ((USART1->ISR & USART_ISR_RXNE) == 0) { }
-		uint8_t d = (uint8_t)USART1->RDR;
+		d = (uint8_t)USART1->RDR;
 		
 		for (uint16_t i = 0; i < 9; i++){
 			if (d == input[i][0]){
@@ -24,10 +25,20 @@ int main(void)
 			}
 		}
 		
+		if (d == 0x39){
+			for (uint16_t i=0; i<8; i++){
+				msg((uint8_t)input[i][0],check[i]);
+			}
+			continue;
+		}
+		
 		if (elem == 8){
 			for (int16_t i = 0; i<8; i++){
 				GPIOB->BSRR = reg[i] << 16;
 				check[i] = 0;
+			}
+			for (uint16_t i=0; i<8; i++){
+				msg((uint8_t)input[i][0],check[i]);
 			}
 			continue;
 		}
@@ -35,40 +46,41 @@ int main(void)
 		if (check[elem] == 0){
 			GPIOB->BSRR |= reg[elem];
 			check[elem] = 1;
-			while ((USART1->ISR & USART_ISR_TXE) == 0) { }
-			msg(elem, check[elem]);
+			msg(d, check[elem]);
 			continue;
 		}
 		else{
 			GPIOB->BSRR |= reg[elem]<<16;
 			check[elem] = 0;
-			d = 0x0;
-			while ((USART1->ISR & USART_ISR_TXE) == 0) { }
-			msg(elem, check[elem]);
+			msg(d, check[elem]);
 		  continue;
 		}
 		
 	}
 }
 
-void msg (unsigned number, unsigned flag){
-	uint8_t text1[6] = {0x44, 0x69, 0x6f, 0x64, 0xe0,0x20};
-	uint8_t text2[4] = {0x6f, 0x6e, 0xD, 0xA};
-	uint8_t text3[5] = {0x6f, 0x66,0x66, 0xD, 0xA};
+void msg (uint8_t number, unsigned flag){
+	uint8_t textDiod [5] = {0x44, 0x69, 0x6F, 0x64,0x20};
+	uint8_t textOn[5] = {0x20, 0x6f, 0x6e, 0x0D, 0x0A};
+	uint8_t textOff[6] = {0x20, 0x6f, 0x66,0x66, 0x0D, 0x0A};
 
-	/*	for (uint16_t i=0; i<6; i++){
-			USART1->TDR = text1[i];
+		for (uint16_t i=0; i<5; i++){
+			while ((USART1->ISR & USART_ISR_TXE) == 0) { }
+			USART1->TDR = textDiod[i];
 		}
-		USART1->TDR = (uint8_t)number;*/
+		while ((USART1->ISR & USART_ISR_TXE) == 0) { }
+		USART1->TDR = number;
 		
 		if (flag == 1){
-			for (uint16_t i=0; i<4; i++){
-			USART1->TDR = text2[i];
+			for (uint16_t i=0; i<5; i++){
+			while ((USART1->ISR & USART_ISR_TXE) == 0) { }
+			USART1->TDR = textOn[i];
 			}
 		}
 		else {
-			for (uint16_t i=0; i<5; i++){
-			USART1->TDR = text3[i];		
+			for (uint16_t i=0; i<6; i++){
+			while ((USART1->ISR & USART_ISR_TXE) == 0) { }
+			USART1->TDR = textOff[i];		
 			}
 		}
 }
