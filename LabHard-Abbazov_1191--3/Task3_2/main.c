@@ -15,9 +15,11 @@
 
 static uint8_t buf[256];							 //Буфер данных, передаваемых на ПК посредством USART
 static uint32_t iReadyTX , iCompleteTX ; //Количество битовых пакетов готовых для передачи и переденных на ПК соответственно int main ()
-static uint32_t delay_count = 123456;
-static uint32_t delayCountArr[] = {1, 2, 3, 4, 5, 6};
+static uint32_t delayCountArr[6] = {1, 2, 3, 4, 5, 6};
+static uint32_t tempDelayArr[6] = {0, 0, 0, 0, 0, 0};
+static int8_t count = -1;
 static uint32_t delayCount = 0;
+static uint8_t flag = 0;
 
 int main()
 {
@@ -36,15 +38,17 @@ int main()
 	NVIC->ISER[0] |= 0x08000000; 															//Разрешение в NVIC прерывания от модуля USART1 	
 	__enable_irq();																						//Глобальное разрешение прерываний 
 
-	for (int32_t i = 5, j = 0; i >-1; i --, j++){
-		delayCount += delayCountArr[i] * pov(10, j);
-	}
+	
 	
 	while(1){
+		for (int32_t i = 5, j = 0; i >-1; i --, j++){
+			delayCount = 0;
+			delayCount += delayCountArr[i] * powi(10, (uint32_t)j);
+		}
 		GPIOB->BSRR= 0x1;																				//Зажечь светодиод, подключенный к выводу РВ.О
-		delay(delay_count);																	//Задержка после включения светодиода
+		delay(delayCount);																	//Задержка после включения светодиода
 		GPIOB->BSRR=0x10000; 																		//Погасить светодиод, подключенный к выводу РВ.О
-		delay (delay_count);																	//Задержка после выключения светодиода 
+		delay (delayCount);																	//Задержка после выключения светодиода 
 	}
 }
 
@@ -84,119 +88,135 @@ void InitUSART1(){
 }
 
 //Функция задержки: count - количество элементарных периодов задержки с длительностью примерно 2.5 мкс 
-void delay(uint32_t count)
+void delay(uint32_t counts)
 {
 	volatile uint32_t i;																				//объявляем неоптимизируемую переменную
-	for (i=0;i<count;i++);																			//Выполнение пустых циклов для реализации программной задержки
+	for (i=0;i<counts;i++);																			//Выполнение пустых циклов для реализации программной задержки
 }
 
 //Функция-обработчик прерывания от модуля USART1 
 void USART1_IRQHandler(void)
 {
-	uint32_t d100000 = 0;
-	uint32_t d10000 = 0;
-	uint32_t d1000 = 0;
-	uint32_t d100 = 0;
-	uint32_t d10 = 0;
-	uint32_t tempDelay = 0;
-	uint32_t multiplier = 1;
-	uint8_t count = 0;
-	uint8_t flagNotZero = 0;
-	uint8_t flagInput = 0;
 	uint8_t pack;
-	uint8_t textStatus[21] = {0xCF,0xE5,0xF0,0xE8,0xEE,0xE4,0x20,0xEC, 0xE8, 0xE3, 0xE0, 0xED, 0xE8, 0xFF, 0x2C, 0x20, 0xEC, 0xEA, 0xF1, 0x3A, 0x20};	
+	uint8_t textStatus[23] = {0xCF,0xE5,0xF0,0xE8,0xEE,0xE4,0x20,0xEC, 0xE8, 0xE3, 0xE0, 0xED, 0xE8, 0xFF, 0x2C, 0x20, 0xEC, 0xEA, 0xF1, 0x3A, 0x20};	
 	uint8_t textInput[22] = {0xD,0xA,0xCD,0xEE,0xE2,0xEE,0xE5,0x20, 0xE7, 0xED, 0xE0, 0xF, 0xE5, 0xED, 0xE8, 0xE5, 0x20, 0xEC, 0xEA, 0xF1, 0x3A, 0x20};	
 
 		//Событие готовности принятых данных к чтению  
 	if (USART1->ISR & USART_ISR_RXNE) { 												//Если в регистре состояний USART1 установлен флаг "RXNE", то
 		pack=(uint8_t)USART1->RDR; 																//Чтение принятого битового пакета из буферного регистра приемника USART1 
 		
-		if (pack == 0x0D && flagInput == 0){
-			for(uint8_t i = 0; i<21; i++){
-					buf[(uint8_t)iReadyTX++] = textStatus[i];
-			}
-			d100000 = (uint8_t)(delay_count/100000);
-			if (d100000 != 0){
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d100000 + 48);
-				flagNotZero = 1;
-			}
-			if (flagNotZero == 1){
-				d10000 = delay_count-d100000*100000;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d10000/10000 + 48);
-			}
-			else if(delay_count/10000 != 0){
-				d10000 = delay_count;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d10000/10000 + 48);
-				flagNotZero = 1;
-			}
-			if (flagNotZero == 1){
-				d1000 = d10000-d10000/10000*10000;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d1000/1000 + 48);
-			}
-			else if(delay_count/1000 != 0){
-				d1000 = delay_count;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d1000/1000 + 48);
-				flagNotZero = 1;
-			}
-			if (flagNotZero == 1){
-				d100 = d1000-d1000/1000*1000;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d100/100 + 48);
-			}
-			else if(delay_count/100 != 0){
-				d100 = delay_count;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d100/100 + 48);
-				flagNotZero = 1;
-			}
-			if (flagNotZero == 1){
-				d10 = d100-d100/100*100;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d10/10 + 48);
-			}
-			else if(delay_count/10 != 0){
-				d10 = delay_count;
-				buf[(uint8_t)iReadyTX++] = (uint8_t)(d10/10 + 48);
-			}
-			buf[(uint8_t)iReadyTX++] = (uint8_t)(d10%10 + 48);
-			buf[(uint8_t)iReadyTX++] = 0x20;
-			flagInput = 1;
-		}
-		
-		if (pack == 0x0D && flagInput == 1){
-			for(uint8_t i = 0; i<22; i++){
+		switch ( pack ) {
+		case 0x0D:
+			if(flag == 0){
+				for(uint8_t i = 0; i<23; i++){
+						buf[(uint8_t)iReadyTX++] = textStatus[i];
+				}
+				for(uint8_t i = 0; i<6; i++){
+					buf[(uint8_t)iReadyTX++] = (uint8_t)delayCountArr[i] + 48;
+				}
+				for(uint8_t i = 0; i<22; i++){
 					buf[(uint8_t)iReadyTX++] = textInput[i];
+				}
+				flag = 1;
+				outFirstChar();
 			}
-		}
-		
-		if(pack >=48 && pack <=57 && count<7 &&(flagInput == 1 || flagInput == 2) )
-		{
-			buf[(uint8_t)iReadyTX++] = (uint8_t)USART1->RDR;
-			count++;
-			flagInput = 2;
-		}
-		
-		if (pack == 0x0D && flagInput == 2){
-			buf[(uint8_t)iReadyTX++] = 0xD;
-			buf[(uint8_t)iReadyTX++] = 0xA;
-			for (uint8_t i = 0; i<count; i ++){
-				tempDelay += (buf[(uint8_t)iReadyTX-2-i]48)* multiplier;
-				multiplier = multiplier * 10;
+			else{
+				flag = 0;
+				updateDelay();
+				buf[(uint8_t)iReadyTX++] = 0XD;
+				buf[(uint8_t)iReadyTX++] = 0XA;
+				outFirstChar();
 			}
-			delay_count = tempDelay;
-			flagInput = 0;
+			break;
+		case 0x30:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 0;
+				buf[(uint8_t)iReadyTX++] = 0x30;
+				outFirstChar();
+			}
+			break;
+		case 0x31:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 1;
+				buf[(uint8_t)iReadyTX++] = 0x31;
+				outFirstChar();
+			}
+			break;
+		case 0x32:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 2;
+				buf[(uint8_t)iReadyTX++] = 0x32;
+				outFirstChar();
+			}
+			break;
+		case 0x33:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 3;
+				buf[(uint8_t)iReadyTX++] = 0x33;
+				outFirstChar();
+			}
+			break;
+		case 0x34:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 4;
+				buf[(uint8_t)iReadyTX++] = 0x34;
+				outFirstChar();
+			}
+			break;
+		case 0x35:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 5;
+				buf[(uint8_t)iReadyTX++] = 0x35;
+				outFirstChar();
+			}
+			break;
+		case 0x36:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 6;
+				buf[(uint8_t)iReadyTX++] = 0x36;
+				outFirstChar();
+			}
+			break;
+		case 0x37:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 7;
+				buf[(uint8_t)iReadyTX++] = 0x37;
+				outFirstChar();
+			}
+			break;
+		case 0x38:
+			if(count<5){
+				count++;
+				tempDelayArr[count] = 8;
+				buf[(uint8_t)iReadyTX++] = 0x38;	
+				outFirstChar();
+			}
+			break;
+		case 0x39:
+			if(count<5){	
+				count++;
+				tempDelayArr[count] = 9;
+				buf[(uint8_t)iReadyTX++] = 0x39;
+				outFirstChar();
+			}
+			break;
+		case 127:
+			if(count > -1){
+				tempDelayArr[count] = 0;
+				while ((USART1->ISR & USART_ISR_TXE) == 0) {}					//Дождаться готовности передатчика USART1 к приему битового пакета для отправки на ПК
+				USART1->TDR = 127;
+				count--;
+			}
+			break;
 		}
-
-		/*d100=(uint8_t)pack/100; 																	//Определение количества сотен в принятом значении
-		pack -= d100*100;																					//Убрать из принятого значения сотни и оставить в числе 2 значащие цифры, которые соответствуют десяткам и единицам 
-		buf[(uint8_t)iReadyTX++] = d100+48;												//Представить количество сотен в принятом значении в виде ASCII-кода и разместить полученные данные в буфере для передачи на ПК; 
-																															//увеличить количество данных готовых для передачи на единицу
-		buf[(uint8_t)iReadyTX++] = (uint8_t)pack/10+48;						//Представить количество десятков в принятом значении в виде ASCII-кода и разместить полученные данные в буфере для передачи на ПК
-																															//увеличить количество данных готовых для передачи на единицу
-		buf[(uint8_t)iReadyTX++] = (uint8_t)pack%10+48;						//Представить количество единиц в принятом значении в виде ASCII-кода и разместить полученные данные в буфере для передачи на ПК;
-																															//увеличить количество данных готовых для передачи на единицу
-		buf[(uint8_t)iReadyTX++] = 32;								*/						//Поместить после цифр принятого значения разделитель - "пробел";
-																															//увеличить количество данных готовых для передачи на единицу
-		while ((USART1->ISR & USART_ISR_TXE) == 0) {} 						//Дождаться готовности передатчика USART1 к приему битового пакета для отправки на ПК
-		USART1->TDR = buf[(uint8_t)iCompleteTX++];								//Отправить старшую цифру ASCII-кода в передатчик USART1; 
-																															//увеличить количество переданных на ПК данных на единицу
 	}
 	
 	//Событие завершение передачи битового пакета 
@@ -209,6 +229,7 @@ void USART1_IRQHandler(void)
 		}
 	}	
 }
+
 
 //powi функция для вычисления степени числа
 //x - число кторое нужно возвести в степень, n - степень в которую нужно возвести
@@ -224,6 +245,31 @@ uint32_t powi(uint32_t x, uint32_t n)
     else																																							//если степень нечётная
         return powi( x * x, n /2)*x;																										//производится рекурсия, передаётся число умноженное на себя и половина степени
 }		
+
+void updateDelay(){
+	if(count > -1){
+		for(uint8_t i = 0; i<6; i++){
+			delayCountArr[i] = 0;
+		}
+		for(int8_t i = 5; i>=0; i--){
+			delayCountArr[i] = tempDelayArr[count];
+			count--;
+			if (count == -1){
+					break;
+				}
+		}
+		for(uint8_t i = 0; i<6; i++){
+			tempDelayArr[i] = 0;
+		}
+		count = -1;
+	}	
+}
+
+void outFirstChar(){
+	while ((USART1->ISR & USART_ISR_TXE) == 0) {} 						//Дождаться готовности передатчика USART1 к приему битового пакета для отправки на ПК
+	USART1->TDR = buf[(uint8_t)iCompleteTX++];								//Отправить старшую цифру ASCII-кода в передатчик USART1; 
+																														//увеличить количество переданных на ПК данных на единицу
+	}
 
 /*----------------------------------------------------------------------------------------------------------------------------------------
 **Руководство пользователя:

@@ -1,13 +1,13 @@
 <!doctype html public "-//w3c//dtd html 4.0 transitional//en">
 <html><head>
-<title>Static Call Graph - [.\Objects\avr3_2.axf]</title></head>
+<title>Static Call Graph - [.\Objects\avr3_3.axf]</title></head>
 <body><HR>
-<H1>Static Call Graph for image .\Objects\avr3_2.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Mon Jun  7 09:40:55 2021
+<H1>Static Call Graph for image .\Objects\avr3_3.axf</H1><HR>
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6150002: Last Updated: Wed Jun  9 09:57:50 2021
 <BR><P>
 <H3>Maximum Stack Usage =         40 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-USART1_IRQHandler &rArr; updateDelay
+__rt_entry_main &rArr; main &rArr; debug &rArr; output
 <P>
 <H3>
 Functions with no stack information
@@ -24,7 +24,6 @@ Mutually Recursive functions
  <LI><a href="#[4]">PendSV_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">PendSV_Handler</a><BR>
  <LI><a href="#[5]">SysTick_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[5]">SysTick_Handler</a><BR>
  <LI><a href="#[12]">ADC1_COMP_IRQHandler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[12]">ADC1_COMP_IRQHandler</a><BR>
- <LI><a href="#[3e]">powi</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[3e]">powi</a><BR>
 </UL>
 <P>
 <H3>
@@ -186,8 +185,8 @@ Global Symbols
 <P><STRONG><a name="[60]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[31]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16 + Unknown Stack Size
-<LI>Call Chain = __rt_entry_main &rArr; main &rArr; InitUSART1
+<BR><BR>[Stack]<UL><LI>Max Depth = 40 + Unknown Stack Size
+<LI>Call Chain = __rt_entry_main &rArr; main &rArr; debug &rArr; output
 </UL>
 <BR>[Calls]<UL><LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
 <LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -348,11 +347,17 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__user_setup_stackheap
 </UL>
 
-<P><STRONG><a name="[63]"></a>__use_two_region_memory</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
+<P><STRONG><a name="[3f]"></a>__aeabi_uidivmod</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, aeabi_sdivfast.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output
+</UL>
 
-<P><STRONG><a name="[64]"></a>__rt_heap_escrow$2region</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
+<P><STRONG><a name="[63]"></a>__aeabi_idivmod</STRONG> (Thumb, 472 bytes, Stack size 8 bytes, aeabi_sdivfast.o(.text), UNUSED)
 
-<P><STRONG><a name="[65]"></a>__rt_heap_expand$2region</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
+<P><STRONG><a name="[64]"></a>__use_two_region_memory</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
+
+<P><STRONG><a name="[65]"></a>__rt_heap_escrow$2region</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
+
+<P><STRONG><a name="[66]"></a>__rt_heap_expand$2region</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, heapauxi.o(.text), UNUSED)
 
 <P><STRONG><a name="[2e]"></a>__user_setup_stackheap</STRONG> (Thumb, 62 bytes, Stack size 8 bytes, sys_stackheap_outer.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8 + Unknown Stack Size
@@ -374,23 +379,23 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[66]"></a>__user_libspace</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, libspace.o(.text), UNUSED)
+<P><STRONG><a name="[67]"></a>__user_libspace</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, libspace.o(.text), UNUSED)
 
 <P><STRONG><a name="[38]"></a>__user_perproc_libspace</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, libspace.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__user_setup_stackheap
 </UL>
 
-<P><STRONG><a name="[67]"></a>__user_perthread_libspace</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, libspace.o(.text), UNUSED)
+<P><STRONG><a name="[68]"></a>__user_perthread_libspace</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, libspace.o(.text), UNUSED)
 
 <P><STRONG><a name="[37]"></a>_sys_exit</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, sys_exit.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[36]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_exit_exit
 </UL>
 
-<P><STRONG><a name="[68]"></a>__I$use$semihosting</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, use_no_semi.o(.text), UNUSED)
+<P><STRONG><a name="[69]"></a>__I$use$semihosting</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, use_no_semi.o(.text), UNUSED)
 
-<P><STRONG><a name="[69]"></a>__use_no_semihosting_swi</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, use_no_semi.o(.text), UNUSED)
+<P><STRONG><a name="[6a]"></a>__use_no_semihosting_swi</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, use_no_semi.o(.text), UNUSED)
 
-<P><STRONG><a name="[6a]"></a>__semihosting_library_function</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, indicate_semi.o(.text), UNUSED)
+<P><STRONG><a name="[6b]"></a>__semihosting_library_function</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, indicate_semi.o(.text), UNUSED)
 
 <P><STRONG><a name="[3d]"></a>InitUSART1</STRONG> (Thumb, 144 bytes, Stack size 16 bytes, main.o(.text.InitUSART1))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = InitUSART1
@@ -401,49 +406,40 @@ Global Symbols
 <P><STRONG><a name="[26]"></a>SystemInit</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, system_stm32f0xx.o(.text.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f072xb.o(.text)
 </UL>
-<P><STRONG><a name="[21]"></a>USART1_IRQHandler</STRONG> (Thumb, 904 bytes, Stack size 24 bytes, main.o(.text.USART1_IRQHandler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = USART1_IRQHandler &rArr; updateDelay
-</UL>
-<BR>[Calls]<UL><LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;updateDelay
-<LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;outFirstChar
-</UL>
+<P><STRONG><a name="[21]"></a>USART1_IRQHandler</STRONG> (Thumb, 236 bytes, Stack size 0 bytes, main.o(.text.USART1_IRQHandler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f072xb.o(RESET)
 </UL>
-<P><STRONG><a name="[3f]"></a>delay</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, main.o(.text.delay))
-<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = delay
+<P><STRONG><a name="[3b]"></a>debug</STRONG> (Thumb, 260 bytes, Stack size 24 bytes, main.o(.text.debug))
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = debug &rArr; output
+</UL>
+<BR>[Calls]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output
 </UL>
 <BR>[Called By]<UL><LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[32]"></a>main</STRONG> (Thumb, 132 bytes, Stack size 0 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = main &rArr; InitUSART1
+<P><STRONG><a name="[32]"></a>main</STRONG> (Thumb, 88 bytes, Stack size 0 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = main &rArr; debug &rArr; output
 </UL>
-<BR>[Calls]<UL><LI><a href="#[3e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powi
-<LI><a href="#[3f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;delay
+<BR>[Calls]<UL><LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;debug
 <LI><a href="#[3d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitUSART1
 </UL>
 <BR>[Called By]<UL><LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[3c]"></a>outFirstChar</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, main.o(.text.outFirstChar))
-<BR><BR>[Called By]<UL><LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART1_IRQHandler
+<P><STRONG><a name="[3c]"></a>output</STRONG> (Thumb, 92 bytes, Stack size 16 bytes, main.o(.text.output))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = output
+</UL>
+<BR>[Calls]<UL><LI><a href="#[3e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidiv
+<LI><a href="#[3f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+</UL>
+<BR>[Called By]<UL><LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;debug
 </UL>
 
-<P><STRONG><a name="[3e]"></a>powi</STRONG> (Thumb, 38 bytes, Stack size 8 bytes, main.o(.text.powi))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8 + In Cycle
-<LI>Call Chain = powi &rArr;  powi (Cycle)
-</UL>
-<BR>[Calls]<UL><LI><a href="#[3e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powi
-</UL>
-<BR>[Called By]<UL><LI><a href="#[3e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;powi
-<LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<P><STRONG><a name="[3e]"></a>__aeabi_uidiv</STRONG> (Thumb, 68 bytes, Stack size 0 bytes, aeabi_sdivfast.o(.text_divfast))
+<BR><BR>[Called By]<UL><LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;output
 </UL>
 
-<P><STRONG><a name="[3b]"></a>updateDelay</STRONG> (Thumb, 96 bytes, Stack size 16 bytes, main.o(.text.updateDelay))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = updateDelay
-</UL>
-<BR>[Called By]<UL><LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;USART1_IRQHandler
-</UL>
+<P><STRONG><a name="[6c]"></a>__aeabi_idiv</STRONG> (Thumb, 434 bytes, Stack size 8 bytes, aeabi_sdivfast.o(.text_divfast), UNUSED)
 <P>
 <H3>
 Local Symbols
