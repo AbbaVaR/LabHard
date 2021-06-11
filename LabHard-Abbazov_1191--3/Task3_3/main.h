@@ -2,5 +2,5 @@
 void InitUSART1(void); 								//Декларация функции инициализации USART1
 void USART1_IRQHandler(void); 				//Декларация функции обработки прерывания от USART1
 void delay(uint32_t);									//Декларация Функции задержки
-void debug(void);
-void output (uint32_t);
+void debug(void);											//Декларация Функции debug
+void output (uint32_t);								//Декларация Функции вывода
